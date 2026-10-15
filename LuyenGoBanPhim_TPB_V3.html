@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Luyện gõ bàn phím – từ cơ bản đến nâng cao</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Smooth transitions and glow states for keys and UI */
+    .key {
+      transition: transform 120ms ease, background-color 160ms ease, box-shadow 160ms ease, color 160ms ease;
+      user-select: none;
+      touch-action: manipulation;
+    }
+    .key-press {
+      transform: translateY(1px) scale(0.99);
+      box-shadow: 0 0 0 0 rgba(0,0,0,0);
+    }
+    .key-hint {
+      box-shadow: 0 0 0 2px rgba(255,255,255,0.5), 0 0 18px rgba(124,58,237,0.45);
+    }
+    .key-warn {
+      animation: warn 220ms ease;
+      background: #ef4444 !important;
+      color: white !important;
+    }
+    @keyframes warn {
+      0% { transform: translateY(0) scale(1); }
+      50% { transform: translateY(-2px) scale(1.02); }
+      100% { transform: translateY(0) scale(1); }
+    }
+
+    .text-char { transition: color 120ms ease, background-color 120ms ease; }
+    .text-char.active { background: rgba(255,255,255,0.14); border-radius: 6px; }
+    .text-char.correct { color: #22c55e; }
+    .text-char.wrong { color: #ef4444; }
+    .caret {
+      display: inline-block;
+      width: 2px;
+      height: 1.1em;
+      background: #ffffff;
+      margin-left: 1px;
+      vertical-align: -0.2em;
+      animation: blink 1s step-start infinite;
+      border-radius: 1px;
+    }
+    @keyframes blink { 50% { opacity: 0; } }
+
+    /* Make keyboard rows wrap nicely on small screens */
+    .row-wrap { display: grid; grid-auto-flow: column; gap: 8px; }
+    @media (max-width: 1024px) {
+      .row-wrap { grid-auto-flow: row; }
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-fuchsia-800 text-white selection:bg-white/20 selection:text-white/90">
+
+  <div class="max-w-6xl mx-auto px-4 py-8 sm:py-10">
+    <!-- Header -->
+    <header class="mb-6 sm:mb-8">
+      <div class="flex items-center justify-between gap-4">
+        <div>
+          <h1 class="text-2xl sm:text-3xl font-bold tracking-tight">
+            Luyện gõ bàn phím – Từ cơ bản đến nâng cao
+          </h1>
+          <p class="text-white/70 mt-1 text-sm">
+            Tịch ích được tạo bởi thầy Trần Phùng Bính
+          </p>
+        </div>
+        <div class="hidden sm:flex items-center gap-2 text-sm text-white/70">
+          <span class="inline-flex items-center gap-2 bg-white/10 rounded-full px-3 py-1">
+            <span class="w-2 h-2 rounded-full bg-emerald-400"></span> Sẵn sàng
+          </span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Controls -->
+    <section class="bg-white/10 backdrop-blur-xl rounded-2xl p-4 sm:p-5 border border-white/10 shadow-2xl shadow-black/30">
+      <div class="flex flex-col lg:flex-row items-stretch lg:items-end gap-4">
+        <div class="flex-1 grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div>
+            <label class="block text-xs uppercase tracking-wider text-white/70 mb-1">Cấp độ</label>
+            <select id="levelSelect" class="w-full bg-white/10 border border-white/15 text-white rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-fuchsia-400/60">
+              <option value="basic">Cơ bản</option>
+              <option value="intermediate">Trung cấp</option>
+              <option value="advanced">Nâng cao</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs uppercase tracking-wider text-white/70 mb-1">Bài</label>
+            <select id="lessonSelect" class="w-full bg-white/10 border border-white/15 text-white rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-fuchsia-400/60">
+              <!-- filled by JS -->
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs uppercase tracking-wider text-white/70 mb-1">Thời gian</label>
+            <select id="timeSelect" class="w-full bg-white/10 border border-white/15 text-white rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-fuchsia-400/60">
+              <option value="0">Không giới hạn</option>
+              <option value="60">60 giây</option>
+              <option value="120">120 giây</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="flex gap-2">
+          <button id="startBtn" class="bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-700 text-emerald-950 font-semibold px-4 py-2 rounded-xl shadow-lg shadow-emerald-900/30 transition">
+            Bắt đầu
+          </button>
+          <button id="resetBtn" class="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-xl border border-white/10 transition">
+            Làm lại
+          </button>
+          <button id="toggleKbBtn" class="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-xl border border-white/10 transition">
+            Ẩn bàn phím
+          </button>
+        </div>
+      </div>
+
+      <!-- Stats -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-4">
+        <div class="bg-black/20 rounded-xl p-3 border border-white/10">
+          <div class="text-xs text-white/70">Tốc độ</div>
+          <div class="text-lg font-bold"><span id="wpm">0</span> WPM</div>
+        </div>
+        <div class="bg-black/20 rounded-xl p-3 border border-white/10">
+          <div class="text-xs text-white/70">Độ chính xác</div>
+          <div class="text-lg font-bold"><span id="accuracy">100</span>%</div>
+        </div>
+        <div class="bg-black/20 rounded-xl p-3 border border-white/10">
+          <div class="text-xs text-white/70">Thời gian</div>
+          <div class="text-lg font-bold"><span id="time">00:00</span></div>
+        </div>
+        <div class="bg-black/20 rounded-xl p-3 border border-white/10">
+          <div class="text-xs text-white/70">Tiến độ</div>
+          <div class="w-full bg-white/10 rounded-full h-2 mt-2 overflow-hidden">
+            <div id="progressBar" class="h-2 bg-gradient-to-r from-fuchsia-400 to-indigo-400 rounded-full" style="width:0%"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Practice Text -->
+    <section class="mt-6 sm:mt-8">
+      <div class="bg-white/10 backdrop-blur-xl rounded-2xl p-4 sm:p-6 border border-white/10 shadow-2xl shadow-black/30">
+        <div class="flex items-center justify-between gap-3 mb-3">
+          <h2 class="text-lg font-semibold">Vùng luyện gõ</h2>
+          <button id="focusBtn" class="text-xs bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-lg border border-white/10">Bấm để nhập (hoặc gõ trực tiếp)</button>
+        </div>
+        <div id="textContainer" class="text-lg sm:text-xl leading-8 sm:leading-9 tracking-wide text-white/90 min-h-[120px] sm:min-h-[140px] rounded-xl p-4 sm:p-5 bg-black/20 border border-white/10"></div>
+        <!-- hidden input to capture mobile keyboards -->
+        <input id="hiddenInput" class="opacity-0 pointer-events-none absolute -z-10" aria-hidden="true">
+        <p class="text-xs text-white/60 mt-3">
+          Mẹo: Nhìn gợi ý tay trên bàn phím mô phỏng, không nhìn xuống bàn phím thật.
+        </p>
+      </div>
+    </section>
+
+    <!-- Keyboard -->
+    <section id="keyboardSection" class="mt-6 sm:mt-8">
+      <div class="bg-white/10 backdrop-blur-xl rounded-2xl p-3 sm:p-4 border border-white/10 shadow-2xl shadow-black/30">
+        <div class="mb-2 flex items-center justify-between">
+          <h3 class="font-semibold">Bàn phím mô phỏng (chuẩn ANSI)</h3>
+          <span class="text-xs text-white/60">Phím gợi ý sẽ phát sáng</span>
+        </div>
+        <div id="keyboard" class="grid gap-2">
+          <!-- rows filled by JS -->
+        </div>
+      </div>
+      <p class="text-xs text-white/60 mt-2">
+        Lưu ý: Gợi ý phím chính xác cho chữ cái và ký hiệu tiêu chuẩn. Khi dùng bộ gõ tiếng Việt (TELEX/VNI), phần gợi ý không hiển thị các phím dấu/âm đi kèm – bạn vẫn có thể luyện chính tả bình thường.
+      </p>
+    </section>
+
+    <!-- Footer -->
+    <footer class="mt-10 text-center text-white/60 text-sm">
+      © <span id="year"></span> – Luyện gõ bàn phím. Tạo bởi thầy Trần Phùng Bính.
+    </footer>
+  </div>
+
+  <script>
+    // ---- Data: Lessons ----
+    const LESSONS = {
+      basic: [
+        { name: "Hàng cơ bản (F J)", text: "f j fj jf fff jjj fjfj jjff jf jf jf" },
+        { name: "Hàng cơ bản đầy đủ", text: "asdf jkl; asdf jkl; fj fj; jk as; ld a; jk fj as df jk ;l" },
+        { name: "Từ đơn giản", text: "la da sa da ka la sa ja kal sala lala kaka" },
+      ],
+      intermediate: [
+        { name: "Hàng trên", text: "q w e r t y u i o p qw we er rt ty yu ui io op" },
+        { name: "Hàng dưới", text: "z x c v b n m zx cx vc vb bn nm mz zn vm" },
+        { name: "Số và ký hiệu", text: "1 2 3 4 5 6 7 8 9 0 ! ? , . : ; - _ ( )" },
+        { name: "Câu ngắn", text: "Nhanh như chớp, bạn gõ thật đều và chính xác." },
+      ],
+      advanced: [
+        { name: "Dấu câu", text: "Hãy tập trung: đừng nhìn phím! Hít thở đều, gõ nhịp nhàng." },
+        { name: "Đoạn văn", text: "Gõ mười ngón giúp bạn tiết kiệm thời gian và giảm mỏi tay. Kiên trì mỗi ngày, kết quả sẽ đến." },
+        { name: "Tiếng Anh hỗn hợp", text: "Practice makes perfect. Speed, accuracy, and rhythm matter!" },
+      ]
+    };
+
+    // ---- Keyboard Layout (ANSI) ----
+    // keyId is event.code; label is display; width is CSS fraction
+    const KEY_ROWS = [
+      [
+        {id:'Backquote', label:'` ~', w:1}, {id:'Digit1', label:'1 !', w:1}, {id:'Digit2', label:'2 @', w:1}, {id:'Digit3', label:'3 #', w:1},
+        {id:'Digit4', label:'4 $', w:1}, {id:'Digit5', label:'5 %', w:1}, {id:'Digit6', label:'6 ^', w:1}, {id:'Digit7', label:'7 &', w:1},
+        {id:'Digit8', label:'8 *', w:1}, {id:'Digit9', label:'9 (', w:1}, {id:'Digit0', label:'0 )', w:1}, {id:'Minus', label:'- _', w:1},
+        {id:'Equal', label:'= +', w:1}, {id:'Backspace', label:'⌫', w:2}
+      ],
+      [
+        {id:'Tab', label:'Tab', w:1.5}, {id:'KeyQ', label:'Q', w:1}, {id:'KeyW', label:'W', w:1}, {id:'KeyE', label:'E', w:1}, {id:'KeyR', label:'R', w:1},
+        {id:'KeyT', label:'T', w:1}, {id:'KeyY', label:'Y', w:1}, {id:'KeyU', label:'U', w:1}, {id:'KeyI', label:'I', w:1}, {id:'KeyO', label:'O', w:1},
+        {id:'KeyP', label:'P', w:1}, {id:'BracketLeft', label:'[ {', w:1}, {id:'BracketRight', label:'] }', w:1}, {id:'Backslash', label:'\\ |', w:1.5}
+      ],
+      [
+        {id:'CapsLock', label:'Caps', w:1.8}, {id:'KeyA', label:'A', w:1}, {id:'KeyS', label:'S', w:1}, {id:'KeyD', label:'D', w:1},
+        {id:'KeyF', label:'F', w:1}, {id:'KeyG', label:'G', w:1}, {id:'KeyH', label:'H', w:1}, {id:'KeyJ', label:'J', w:1}, {id:'KeyK', label:'K', w:1},
+        {id:'KeyL', label:'L', w:1}, {id:'Semicolon', label:'; :', w:1}, {id:'Quote', label:"' \"", w:1}, {id:'Enter', label:'Enter', w:2.2}
+      ],
+      [
+        {id:'ShiftLeft', label:'Shift', w:2.3}, {id:'KeyZ', label:'Z', w:1}, {id:'KeyX', label:'X', w:1}, {id:'KeyC', label:'C', w:1}, {id:'KeyV', label:'V', w:1},
+        {id:'KeyB', label:'B', w:1}, {id:'KeyN', label:'N', w:1}, {id:'KeyM', label:'M', w:1}, {id:'Comma', label:', <', w:1}, {id:'Period', label:'. >', w:1},
+        {id:'Slash', label:'/ ?', w:1}, {id:'ShiftRight', label:'Shift', w:2.7}
+      ],
+      [
+        {id:'ControlLeft', label:'Ctrl', w:1.5}, {id:'MetaLeft', label:'Win', w:1.2}, {id:'AltLeft', label:'Alt', w:1.2},
+        {id:'Space', label:'Space', w:6}, {id:'AltRight', label:'Alt', w:1.2}, {id:'MetaRight', label:'Win', w:1.2}, {id:'ContextMenu', label:'Menu', w:1.2}, {id:'ControlRight', label:'Ctrl', w:1.5}
+      ]
+    ];
+
+    // ---- State ----
+    let targetText = "";
+    let index = 0;
+    let started = false;
+    let startTime = 0;
+    let timerId = null;
+    let timeLimit = 0; // seconds; 0 means unlimited
+    let mistakes = 0;
+    let typed = 0;
+    let capsOn = false;
+
+    // Elements
+    const levelSelect = document.getElementById('levelSelect');
+    const lessonSelect = document.getElementById('lessonSelect');
+    const timeSelect = document.getElementById('timeSelect');
+    const startBtn = document.getElementById('startBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const toggleKbBtn = document.getElementById('toggleKbBtn');
+    const textContainer = document.getElementById('textContainer');
+    const keyboardEl = document.getElementById('keyboard');
+    const keyboardSection = document.getElementById('keyboardSection');
+    const hiddenInput = document.getElementById('hiddenInput');
+    const focusBtn = document.getElementById('focusBtn');
+
+    const wpmEl = document.getElementById('wpm');
+    const accEl = document.getElementById('accuracy');
+    const timeEl = document.getElementById('time');
+    const progressBar = document.getElementById('progressBar');
+
+    // Footer year
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // ---- Build Lessons UI ----
+    function fillLessons() {
+      lessonSelect.innerHTML = '';
+      const list = LESSONS[levelSelect.value];
+      list.forEach((l, i) => {
+        const opt = document.createElement('option');
+        opt.value = i;
+        opt.textContent = l.name;
+        lessonSelect.appendChild(opt);
+      });
+    }
+    levelSelect.addEventListener('change', () => {
+      fillLessons();
+      loadLesson();
+    });
+
+    // ---- Load Selected Lesson ----
+    function loadLesson() {
+      const list = LESSONS[levelSelect.value];
+      const lesson = list[parseInt(lessonSelect.value, 10)] || list[0];
+      targetText = lesson.text.trim();
+      resetSession(false);
+      renderText();
+      hintNextKey();
+    }
+
+    // ---- Render Practice Text ----
+    function renderText() {
+      textContainer.innerHTML = '';
+      const frag = document.createDocumentFragment();
+      for (let i=0; i<targetText.length; i++) {
+        const ch = targetText[i];
+        const span = document.createElement('span');
+        span.className = 'text-char';
+        span.dataset.pos = i;
+        span.textContent = ch === ' ' ? '·' : ch; // show · for spaces visually
+        if (i === index) {
+          span.classList.add('active');
+          const caret = document.createElement('span');
+          caret.className = 'caret';
+          span.after(caret);
+        }
+        frag.appendChild(span);
+      }
+      // Handle empty text case
+      if (targetText.length === 0) {
+        const span = document.createElement('span');
+        span.className = 'text-char';
+        span.textContent = '...';
+        frag.appendChild(span);
+      }
+      textContainer.appendChild(frag);
+      updateProgress();
+    }
+
+    function updateActiveCaret() {
+      // Remove old caret and active
+      const oldActive = textContainer.querySelectorAll('.text-char.active');
+      oldActive.forEach(a => a.classList.remove('active'));
+      const oldCaret = textContainer.querySelector('.caret');
+      if (oldCaret) oldCaret.remove();
+
+      const next = textContainer.querySelector(`.text-char[data-pos="${index}"]`);
+      if (next) {
+        next.classList.add('active');
+        const caret = document.createElement('span');
+        caret.className = 'caret';
+        next.after(caret);
+        next.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+      }
+    }
+
+    // ---- Keyboard Rendering ----
+    function buildKeyboard() {
+      keyboardEl.innerHTML = '';
+      KEY_ROWS.forEach(row => {
+        const rowEl = document.createElement('div');
+        rowEl.className = 'flex gap-2';
+        row.forEach(k => {
+          const btn = document.createElement('div');
+          btn.className = 'key bg-white/10 border border-white/10 rounded-xl px-2 py-2 text-center text-sm sm:text-base text-white/90 shadow-md shadow-black/20';
+          btn.style.flex = `${k.w} 0 auto`;
+          btn.dataset.code = k.id;
+          btn.innerHTML = `
+            <div class="font-semibold">${k.label.split(' ')[0]}</div>
+            <div class="text-[10px] opacity-70">${k.label.includes(' ') ? k.label.split(' ').slice(1).join(' ') : '&nbsp;'}</div>
+          `;
+          rowEl.appendChild(btn);
+        });
+        keyboardEl.appendChild(rowEl);
+      });
+    }
+
+    // ---- Mapping characters -> key code and shift ----
+    const symbolMap = {
+      '`': ['Backquote', false], '~': ['Backquote', true],
+      '1': ['Digit1', false], '!': ['Digit1', true],
+      '2': ['Digit2', false], '@': ['Digit2', true],
+      '3': ['Digit3', false], '#': ['Digit3', true],
+      '4': ['Digit4', false], '$': ['Digit4', true],
+      '5': ['Digit5', false], '%': ['Digit5', true],
+      '6': ['Digit6', false], '^': ['Digit6', true],
+      '7': ['Digit7', false], '&': ['Digit7', true],
+      '8': ['Digit8', false], '*': ['Digit8', true],
+      '9': ['Digit9', false], '(': ['Digit9', true],
+      '0': ['Digit0', false], ')': ['Digit0', true],
+      '-': ['Minus', false], '_': ['Minus', true],
+      '=': ['Equal', false], '+': ['Equal', true],
+      '[': ['BracketLeft', false], '{': ['BracketLeft', true],
+      ']': ['BracketRight', false], '}': ['BracketRight', true],
+      '\\': ['Backslash', false], '|': ['Backslash', true],
+      ';': ['Semicolon', false], ':': ['Semicolon', true],
+      '\'': ['Quote', false], '"': ['Quote', true],
+      ',': ['Comma', false], '<': ['Comma', true],
+      '.': ['Period', false], '>': ['Period', true],
+      '/': ['Slash', false], '?': ['Slash', true],
+      ' ': ['Space', false],
+      '\n': ['Enter', false],
+      '\r': ['Enter', false],
+    };
+    function charToKey(ch) {
+      if (ch === ' ') return ['Space', false];
+      if (ch === '\n' || ch === '\r') return ['Enter', false];
+      if (symbolMap[ch]) return symbolMap[ch];
+      if (/^[a-z]$/.test(ch)) return ['Key' + ch.toUpperCase(), false];
+      if (/^[A-Z]$/.test(ch)) return ['Key' + ch, true];
+      // For characters outside mapping (e.g., Vietnamese diacritics), we can't highlight exact keys
+      return [null, false];
+    }
+
+    // ---- Highlight logic ----
+    function clearHints() {
+      document.querySelectorAll('.key').forEach(k => k.classList.remove('key-hint'));
+    }
+    function hintNextKey() {
+      clearHints();
+      const ch = targetText[index] || '';
+      const [code, needShift] = charToKey(ch);
+      if (code) {
+        const keyEl = document.querySelector(`.key[data-code="${code}"]`);
+        if (keyEl) keyEl.classList.add('key-hint');
+      }
+      // Show shift hints if needed
+      if (needShift) {
+        const sLeft = document.querySelector('.key[data-code="ShiftLeft"]');
+        const sRight = document.querySelector('.key[data-code="ShiftRight"]');
+        if (sLeft) sLeft.classList.add('key-hint');
+        if (sRight) sRight.classList.add('key-hint');
+      }
+    }
+    function flashKey(code, isCorrect) {
+      const el = document.querySelector(`.key[data-code="${code}"]`);
+      if (!el) return;
+      el.classList.add('key-press');
+      if (!isCorrect) el.classList.add('key-warn');
+      setTimeout(() => {
+        el.classList.remove('key-press');
+        if (!isCorrect) el.classList.remove('key-warn');
+      }, 150);
+    }
+
+    // ---- Timer and Stats ----
+    function formatTime(sec) {
+      const m = Math.floor(sec / 60);
+      const s = sec % 60;
+      return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+    }
+    function updateStats() {
+      const now = performance.now();
+      const elapsedMin = started ? Math.max((now - startTime), 1) / 60000 : 0; // avoid div by zero
+      const words = index / 5;
+      const wpm = started ? Math.round(words / elapsedMin) : 0;
+      const acc = typed ? Math.max(0, Math.round((1 - mistakes / typed) * 100)) : 100;
+
+      wpmEl.textContent = isFinite(wpm) ? wpm : 0;
+      accEl.textContent = acc;
+
+      if (started) {
+        const elapsedSec = Math.floor((now - startTime) / 1000);
+        const remaining = timeLimit > 0 ? Math.max(0, timeLimit - elapsedSec) : elapsedSec;
+        timeEl.textContent = timeLimit > 0 ? formatTime(remaining) : formatTime(elapsedSec);
+
+        if (timeLimit > 0 && remaining <= 0) {
+          finishSession();
+        }
+      } else {
+        timeEl.textContent = '00:00';
+      }
+    }
+    function startTimer() {
+      if (timerId) return;
+      timerId = setInterval(updateStats, 200);
+    }
+    function stopTimer() {
+      if (!timerId) return;
+      clearInterval(timerId);
+      timerId = null;
+    }
+
+    function updateProgress() {
+      const pct = targetText.length ? (index / targetText.length) * 100 : 0;
+      progressBar.style.width = `${pct}%`;
+    }
+
+    function finishSession() {
+      started = false;
+      stopTimer();
+      clearHints();
+      // Gentle success glow
+      textContainer.classList.add('ring-2','ring-emerald-400/60','ring-offset-2','ring-offset-white/10');
+      setTimeout(() => textContainer.classList.remove('ring-2','ring-emerald-400/60','ring-offset-2','ring-offset-white/10'), 1200);
+    }
+
+    // ---- Typing Engine ----
+    function resetSession(clearLesson = false) {
+      started = false;
+      mistakes = 0;
+      typed = 0;
+      index = 0;
+      startTime = 0;
+      stopTimer();
+      timeEl.textContent = '00:00';
+      wpmEl.textContent = '0';
+      accEl.textContent = '100';
+      progressBar.style.width = '0%';
+      if (clearLesson) targetText = '';
+      renderText();
+      clearHints();
+      hintNextKey();
+    }
+
+    function handleInputChar(inputChar, code, shiftKey, isCapsOn) {
+      if (!targetText) return;
+
+      if (!started) {
+        started = true;
+        startTime = performance.now();
+        startTimer();
+      }
+
+      // Normalize Enter to newline for comparison if present
+      if (code === 'Enter') inputChar = '\n';
+
+      const expected = targetText[index];
+      const isCorrect = inputChar === expected;
+
+      // Visual feedback on keys
+      if (code) flashKey(code, isCorrect);
+
+      // Update text state
+      const span = textContainer.querySelector(`.text-char[data-pos="${index}"]`);
+      if (span) {
+        span.classList.remove('active');
+        span.classList.add(isCorrect ? 'correct' : 'wrong');
+      }
+
+      typed++;
+      if (isCorrect) {
+        index++;
+        updateActiveCaret();
+        updateProgress();
+
+        if (index >= targetText.length) {
+          finishSession();
+        } else {
+          hintNextKey();
+        }
+      } else {
+        mistakes++;
+        // Keep the caret on the same index for retry
+        updateActiveCaret();
+        // Subtle shake on container
+        textContainer.classList.add('animate-[shake_0.2s]');
+        setTimeout(()=> textContainer.classList.remove('animate-[shake_0.2s]'), 220);
+      }
+
+      updateStats();
+    }
+
+    // Prevent page scrolling when practicing
+    function shouldPreventDefault(e) {
+      const keys = ['Space','Backspace','Tab','ArrowLeft','ArrowRight','ArrowUp','ArrowDown'];
+      return keys.includes(e.code);
+    }
+
+    // ---- Events ----
+    startBtn.addEventListener('click', () => {
+      timeLimit = parseInt(timeSelect.value, 10) || 0;
+      resetSession(false);
+      // Auto focus hidden input for mobile
+      hiddenInput.focus({preventScroll:true});
+    });
+
+    resetBtn.addEventListener('click', () => {
+      resetSession(false);
+      hiddenInput.value = '';
+      hiddenInput.blur();
+    });
+
+    toggleKbBtn.addEventListener('click', () => {
+      const hidden = keyboardSection.classList.toggle('hidden');
+      toggleKbBtn.textContent = hidden ? 'Hiện bàn phím' : 'Ẩn bàn phím';
+    });
+
+    focusBtn.addEventListener('click', () => {
+      hiddenInput.focus({preventScroll:true});
+    });
+
+    // Keep track of CapsLock state for visual parity
+    window.addEventListener('keydown', (e) => {
+      if (shouldPreventDefault(e)) e.preventDefault();
+
+      // Ignore modifier-only presses
+      if (e.key.length > 1 && !['Enter','Backspace','Tab','Space'].includes(e.key)) {
+        // still flash visual press for realism
+        flashKey(e.code, true);
+        if (e.getModifierState && e.code === 'CapsLock') {
+          capsOn = !capsOn;
+          const capsKey = document.querySelector('.key[data-code="CapsLock"]');
+          if (capsKey) {
+            if (capsOn) capsKey.classList.add('key-hint');
+            else capsKey.classList.remove('key-hint');
+          }
+        }
+        return;
+      }
+
+      let ch = e.key;
+
+      // Normalize Space
+      if (e.code === 'Space') ch = ' ';
+
+      // If IME composing, skip (we'll rely on input event from hidden input)
+      if (e.isComposing) return;
+
+      handleInputChar(ch, e.code, e.shiftKey, e.getModifierState ? e.getModifierState('CapsLock') : false);
+    });
+
+    // Mobile and IME input support via hidden input
+    hiddenInput.addEventListener('beforeinput', (e) => {
+      // Prevent line breaks from mobile input
+      if (e.inputType === 'insertLineBreak') e.preventDefault();
+    });
+
+    hiddenInput.addEventListener('input', (e) => {
+      const val = e.target.value;
+      if (!val) return;
+      // Take the last character typed (works for IME composed chars too)
+      const ch = val.slice(-1);
+      handleInputChar(ch, null, false, false);
+      // Clear input to keep only newest char
+      e.target.value = '';
+    });
+
+    // Build UI on load
+    buildKeyboard();
+    fillLessons();
+    loadLesson();
+
+    // Ensure time limit reacts to select change if started again
+    timeSelect.addEventListener('change', () => {
+      timeLimit = parseInt(timeSelect.value, 10) || 0;
+    });
+
+    // Accessibility: Click on keys to insert their primary label
+    keyboardEl.addEventListener('click', (e) => {
+      const key = e.target.closest('.key');
+      if (!key) return;
+      const code = key.dataset.code;
+      let ch = null;
+
+      // Determine a reasonable character for clickable keys
+      if (code.startsWith('Key')) ch = key.querySelector('div').textContent.trim().toLowerCase();
+      else if (code === 'Space') ch = ' ';
+      else if (code === 'Enter') ch = '\n';
+      else if (code === 'Backspace') {
+        // No backspace action in this trainer; just flash
+        flashKey('Backspace', true);
+        return;
+      } else {
+        // Use first symbol shown
+        const top = key.querySelector('div')?.textContent?.trim() || '';
+        const topText = top.length ? top[0] : null;
+        ch = topText;
+      }
+      if (ch) handleInputChar(ch, code, false, false);
+    });
+
+    // Small custom keyframes for shake (only added when wrong)
+    const styleEl = document.createElement('style');
+    styleEl.textContent = `
+      @keyframes shake {
+        0% { transform: translateX(0) }
+        25% { transform: translateX(-2px) }
+        50% { transform: translateX(2px) }
+        75% { transform: translateX(-2px) }
+        100% { transform: translateX(0) }
+      }
+      .animate-[shake_0.2s] { animation: shake 0.2s linear; }
+    `;
+    document.head.appendChild(styleEl);
+  </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9843229562978de9',t:'MTc1ODcyNTg1NS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
