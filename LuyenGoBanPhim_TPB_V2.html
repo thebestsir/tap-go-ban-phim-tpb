@@ -1,0 +1,1399 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LUYỆN GÕ BÀN PHÍM 10 NGÓN</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .level-selector {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .level-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .level-btn {
+            padding: 15px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: white;
+        }
+
+        .level-btn.basic { background: #4CAF50; }
+        .level-btn.intermediate { background: #FF9800; }
+        .level-btn.advanced { background: #F44336; }
+        .level-btn.game { background: #9C27B0; }
+        .level-btn.active { transform: scale(1.05); box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+
+        .practice-area {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .lesson-title {
+            font-size: 1.5rem;
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .keyboard-guide {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .keyboard {
+            max-width: 900px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .keyboard-row {
+            display: flex;
+            justify-content: center;
+            gap: 3px;
+        }
+
+        .key {
+            background: #e9ecef;
+            border: 2px solid #dee2e6;
+            border-radius: 5px;
+            padding: 8px;
+            text-align: center;
+            font-size: 0.8rem;
+            font-weight: bold;
+            min-height: 40px;
+            min-width: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex: 0 0 auto;
+        }
+
+        .key.highlight { background: #ffd700; border-color: #ffcc00; }
+        .key.finger-1 { background: #ffcccb; }
+        .key.finger-2 { background: #ffd1dc; }
+        .key.finger-3 { background: #e0e0e0; }
+        .key.finger-4 { background: #add8e6; }
+        .key.finger-5 { background: #90ee90; }
+        .key.finger-6 { background: #90ee90; }
+        .key.finger-7 { background: #add8e6; }
+        .key.finger-8 { background: #e0e0e0; }
+        .key.finger-9 { background: #ffd1dc; }
+        .key.finger-10 { background: #ffcccb; }
+
+        .key-wide { min-width: 60px; }
+        .key-wider { min-width: 80px; }
+        .key-widest { min-width: 100px; }
+        .spacebar { min-width: 300px; background: #d4edda; }
+
+        .text-display {
+            background: #f8f9fa;
+            border: 2px solid #dee2e6;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+            line-height: 1.6;
+            min-height: 100px;
+        }
+
+        .char {
+            padding: 2px;
+            border-radius: 3px;
+        }
+
+        .char.correct { background: #d4edda; color: #155724; }
+        .char.incorrect { background: #f8d7da; color: #721c24; }
+        .char.current { background: #fff3cd; border: 2px solid #856404; }
+
+        .input-area {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #dee2e6;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            outline: none;
+        }
+
+        .input-area:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            border: 2px solid #dee2e6;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #007bff;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #6c757d;
+            margin-top: 5px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary { background: #007bff; color: white; }
+        .btn-success { background: #28a745; color: white; }
+        .btn-warning { background: #ffc107; color: #212529; }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+
+        .finger-guide {
+            background: #e3f2fd;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .finger-colors {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .finger-color {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+        }
+
+        .color-box {
+            width: 20px;
+            height: 20px;
+            border-radius: 3px;
+            border: 1px solid #ccc;
+        }
+
+        /* Game Styles */
+        .game-area {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .game-selector {
+            margin-bottom: 30px;
+        }
+
+        .game-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .game-btn {
+            padding: 15px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: white;
+        }
+
+        .game-btn.active {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .game-container {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .game-stats {
+            display: flex;
+            gap: 20px;
+            font-weight: bold;
+        }
+
+        .game-canvas {
+            background: linear-gradient(to bottom, #87CEEB 0%, #98FB98 100%);
+            border: 3px solid #333;
+            border-radius: 10px;
+            height: 400px;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+
+        .cannon {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 2rem;
+        }
+
+        .falling-word {
+            position: absolute;
+            background: #fff;
+            border: 2px solid #333;
+            border-radius: 5px;
+            padding: 5px 10px;
+            font-weight: bold;
+            animation: fall linear;
+        }
+
+        @keyframes fall {
+            from { top: -50px; }
+            to { top: 400px; }
+        }
+
+        .race-track {
+            background: #666;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+        }
+
+        .race-lane {
+            background: #333;
+            border: 2px solid #fff;
+            border-radius: 5px;
+            height: 60px;
+            margin-bottom: 10px;
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .car {
+            font-size: 2rem;
+            position: absolute;
+            left: 10px;
+            transition: left 0.3s ease;
+        }
+
+        .car-name {
+            position: absolute;
+            right: 10px;
+            color: white;
+            font-weight: bold;
+        }
+
+        .race-text {
+            background: #fff;
+            border: 2px solid #333;
+            border-radius: 10px;
+            padding: 15px;
+            font-size: 1.2rem;
+            text-align: center;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        .zombie-field {
+            background: linear-gradient(to bottom, #8B4513 0%, #228B22 100%);
+            border: 3px solid #333;
+            border-radius: 10px;
+            height: 300px;
+            position: relative;
+            margin-bottom: 15px;
+            overflow: hidden;
+        }
+
+        .player {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 2rem;
+        }
+
+        .zombie {
+            position: absolute;
+            font-size: 1.5rem;
+            animation: zombieWalk 3s linear infinite;
+        }
+
+        @keyframes zombieWalk {
+            from { right: -50px; }
+            to { right: 100%; }
+        }
+
+        .zombie-word {
+            background: #fff;
+            border: 2px solid #333;
+            border-radius: 10px;
+            padding: 15px;
+            font-size: 1.5rem;
+            text-align: center;
+            margin-bottom: 15px;
+            font-weight: bold;
+            color: #d32f2f;
+        }
+
+        .game-input {
+            width: 100%;
+            padding: 15px;
+            border: 3px solid #333;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            outline: none;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .game-input:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+        }
+
+        .game-controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .explosion {
+            position: absolute;
+            font-size: 2rem;
+            animation: explode 0.5s ease-out;
+        }
+
+        @keyframes explode {
+            0% { transform: scale(0); opacity: 1; }
+            100% { transform: scale(2); opacity: 0; }
+        }
+
+        @media (max-width: 768px) {
+            .keyboard {
+                max-width: 100%;
+                gap: 3px;
+            }
+            
+            .keyboard-row {
+                gap: 2px;
+            }
+            
+            .key {
+                font-size: 0.7rem;
+                padding: 6px 4px;
+                min-height: 35px;
+                min-width: 30px;
+            }
+            
+            .key-wide { min-width: 45px; }
+            .key-wider { min-width: 60px; }
+            .key-widest { min-width: 75px; }
+            .spacebar { min-width: 200px; }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .game-header {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .game-stats {
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+
+            .game-canvas {
+                height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 LUYỆN GÕ BÀN PHÍM 10 NGÓN</h1>
+            <p>Từ cơ bản đến nâng cao - Luyện tập đúng tư thế</p>
+            <p style="font-size: 0.9rem; margin-top: 10px; opacity: 0.8;">
+                📝 Tiện ích được tạo bởi thầy Trần Phùng Bính
+            </p>
+        </div>
+
+        <div class="level-selector">
+            <h3 style="text-align: center; margin-bottom: 15px;">Chọn Chế Độ</h3>
+            <div class="level-buttons">
+                <button class="level-btn basic active" onclick="selectMode('basic')">
+                    🌱 Cơ Bản<br><small>Hàng giữa ASDF - JKL;</small>
+                </button>
+                <button class="level-btn intermediate" onclick="selectMode('intermediate')">
+                    🚀 Trung Cấp<br><small>Tất cả các hàng</small>
+                </button>
+                <button class="level-btn advanced" onclick="selectMode('advanced')">
+                    🏆 Nâng Cao<br><small>Từ & câu phức tạp</small>
+                </button>
+                <button class="level-btn game" onclick="selectMode('game')">
+                    🎮 Trò Chơi<br><small>Bắn từ rơi & đua xe</small>
+                </button>
+            </div>
+        </div>
+
+        <div class="practice-area" id="practiceArea">
+            <h2 class="lesson-title" id="lessonTitle">Bài 1: Làm quen với hàng giữa (ASDF - JKL;)</h2>
+            
+            <div class="finger-guide" id="fingerGuide">
+                <h4>🖐️ Hướng dẫn đặt ngón tay:</h4>
+                <p><strong>Tay trái:</strong> Ngón út (A), Ngón áp út (S), Ngón giữa (D), Ngón trỏ (F)</p>
+                <p><strong>Tay phải:</strong> Ngón trỏ (J), Ngón giữa (K), Ngón áp út (L), Ngón út (;)</p>
+                <div class="finger-colors">
+                    <div class="finger-color">
+                        <div class="color-box" style="background: #ffcccb;"></div>
+                        <span>Ngón út</span>
+                    </div>
+                    <div class="finger-color">
+                        <div class="color-box" style="background: #ffd1dc;"></div>
+                        <span>Ngón áp út</span>
+                    </div>
+                    <div class="finger-color">
+                        <div class="color-box" style="background: #e0e0e0;"></div>
+                        <span>Ngón giữa</span>
+                    </div>
+                    <div class="finger-color">
+                        <div class="color-box" style="background: #add8e6;"></div>
+                        <span>Ngón trỏ</span>
+                    </div>
+                    <div class="finger-color">
+                        <div class="color-box" style="background: #90ee90;"></div>
+                        <span>Ngón cái</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="keyboard-guide" id="keyboardGuide">
+                <div class="keyboard" id="keyboard">
+                    <!-- Keyboard will be generated by JavaScript -->
+                </div>
+            </div>
+
+            <div class="text-display" id="textDisplay">
+                <span class="char current">a</span><span class="char">s</span><span class="char">d</span><span class="char">f</span><span class="char"> </span><span class="char">j</span><span class="char">k</span><span class="char">l</span><span class="char">;</span>
+            </div>
+
+            <input type="text" class="input-area" id="textInput" placeholder="Bắt đầu gõ ở đây..." autocomplete="off">
+
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-value" id="wpm">0</div>
+                    <div class="stat-label">Từ/phút</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="accuracy">100%</div>
+                    <div class="stat-label">Độ chính xác</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="progress">0%</div>
+                    <div class="stat-label">Tiến độ</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="time">0</div>
+                    <div class="stat-label">Thời gian (s)</div>
+                </div>
+            </div>
+
+            <div class="controls">
+                <button class="btn btn-primary" onclick="startNewLesson()">🔄 Bài mới</button>
+                <button class="btn btn-success" onclick="nextLesson()">➡️ Bài tiếp theo</button>
+                <button class="btn btn-warning" onclick="resetStats()">📊 Reset thống kê</button>
+            </div>
+        </div>
+
+        <!-- Game Area -->
+        <div class="game-area" id="gameArea" style="display: none;">
+            <div class="game-selector">
+                <h3 style="text-align: center; margin-bottom: 20px;">🎮 Chọn Trò Chơi</h3>
+                <div class="game-buttons">
+                    <button class="game-btn active" onclick="selectGame('falling')" style="background: #FF5722;">
+                        🌧️ Bắn Từ Rơi<br><small>Gõ từ để tiêu diệt</small>
+                    </button>
+                    <button class="game-btn" onclick="selectGame('racing')" style="background: #2196F3;">
+                        🏎️ Đua Xe Chữ<br><small>Gõ nhanh để thắng</small>
+                    </button>
+                    <button class="game-btn" onclick="selectGame('zombie')" style="background: #4CAF50;">
+                        🧟 Zombie Chữ<br><small>Gõ để sinh tồn</small>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Falling Words Game -->
+            <div class="game-container" id="fallingGame">
+                <div class="game-header">
+                    <h3>🌧️ Bắn Từ Rơi - Gõ để tiêu diệt!</h3>
+                    <div class="game-stats">
+                        <span>❤️ Mạng: <span id="lives">3</span></span>
+                        <span>🎯 Điểm: <span id="score">0</span></span>
+                        <span>⚡ Level: <span id="level">1</span></span>
+                    </div>
+                </div>
+                <div class="game-canvas" id="gameCanvas">
+                    <div class="cannon">🔫</div>
+                </div>
+                <input type="text" class="game-input" id="gameInput" placeholder="Gõ từ để bắn..." autocomplete="off">
+                <div class="game-controls">
+                    <button class="btn btn-success" onclick="startGame('falling')">🎮 Bắt đầu</button>
+                    <button class="btn btn-warning" onclick="pauseGame()">⏸️ Tạm dừng</button>
+                    <button class="btn btn-primary" onclick="resetGame()">🔄 Chơi lại</button>
+                </div>
+            </div>
+
+            <!-- Racing Game -->
+            <div class="game-container" id="racingGame" style="display: none;">
+                <div class="game-header">
+                    <h3>🏎️ Đua Xe Chữ - Gõ nhanh để thắng!</h3>
+                    <div class="game-stats">
+                        <span>🏁 Quãng đường: <span id="distance">0</span>m</span>
+                        <span>⚡ Tốc độ: <span id="speed">0</span> km/h</span>
+                        <span>🏆 Vị trí: <span id="position">4/4</span></span>
+                    </div>
+                </div>
+                <div class="race-track">
+                    <div class="race-lane">
+                        <div class="car player-car">🏎️</div>
+                        <div class="car-name">Bạn</div>
+                    </div>
+                    <div class="race-lane">
+                        <div class="car ai-car">🚗</div>
+                        <div class="car-name">AI 1</div>
+                    </div>
+                    <div class="race-lane">
+                        <div class="car ai-car">🚙</div>
+                        <div class="car-name">AI 2</div>
+                    </div>
+                    <div class="race-lane">
+                        <div class="car ai-car">🚕</div>
+                        <div class="car-name">AI 3</div>
+                    </div>
+                </div>
+                <div class="race-text" id="raceText">the quick brown fox</div>
+                <input type="text" class="game-input" id="raceInput" placeholder="Gõ câu trên để đua..." autocomplete="off">
+                <div class="game-controls">
+                    <button class="btn btn-success" onclick="startGame('racing')">🏁 Bắt đầu đua</button>
+                    <button class="btn btn-primary" onclick="resetGame()">🔄 Đua lại</button>
+                </div>
+            </div>
+
+            <!-- Zombie Game -->
+            <div class="game-container" id="zombieGame" style="display: none;">
+                <div class="game-header">
+                    <h3>🧟 Zombie Chữ - Gõ để sinh tồn!</h3>
+                    <div class="game-stats">
+                        <span>❤️ HP: <span id="health">100</span></span>
+                        <span>🔫 Đạn: <span id="ammo">∞</span></span>
+                        <span>💀 Tiêu diệt: <span id="kills">0</span></span>
+                    </div>
+                </div>
+                <div class="zombie-field" id="zombieField">
+                    <div class="player">🤠</div>
+                </div>
+                <div class="zombie-word" id="zombieWord">zombie</div>
+                <input type="text" class="game-input" id="zombieInput" placeholder="Gõ từ để bắn zombie..." autocomplete="off">
+                <div class="game-controls">
+                    <button class="btn btn-success" onclick="startGame('zombie')">🧟 Bắt đầu</button>
+                    <button class="btn btn-warning" onclick="pauseGame()">⏸️ Tạm dừng</button>
+                    <button class="btn btn-primary" onclick="resetGame()">🔄 Chơi lại</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentMode = 'basic';
+        let currentLessonIndex = 0;
+        let currentText = '';
+        let currentPosition = 0;
+        let startTime = null;
+        let totalChars = 0;
+        let correctChars = 0;
+        let timer = null;
+
+        // Game variables
+        let currentGame = 'falling';
+        let gameActive = false;
+        let gamePaused = false;
+        let gameTimer = null;
+        let fallingWords = [];
+        let gameScore = 0;
+        let gameLives = 3;
+        let gameLevel = 1;
+        let raceProgress = 0;
+        let aiProgress = [0, 0, 0];
+        let zombieHealth = 100;
+        let zombieKills = 0;
+        let currentZombieWord = '';
+
+        const gameWords = {
+            easy: ['cat', 'dog', 'run', 'jump', 'fast', 'slow', 'big', 'small', 'red', 'blue'],
+            medium: ['house', 'water', 'light', 'music', 'happy', 'quick', 'brown', 'green', 'black', 'white'],
+            hard: ['computer', 'keyboard', 'practice', 'exercise', 'challenge', 'adventure', 'beautiful', 'wonderful']
+        };
+
+        const lessons = {
+            basic: [
+                {
+                    title: "Bài 1: Làm quen với hàng giữa (ASDF - JKL;)",
+                    text: "asdf jkl; asdf jkl; fff jjj ddd kkk sss lll aaa ;;; asdf jkl;"
+                },
+                {
+                    title: "Bài 2: Luyện tập từng cặp ngón",
+                    text: "af af af ja ja ja sk sk sk dl dl dl fj fj fj dk dk dk sl sl sl"
+                },
+                {
+                    title: "Bài 3: Kết hợp các ngón tay",
+                    text: "ask ask ask fad fad fad jak jak jak lads lads lads flask flask"
+                },
+                {
+                    title: "Bài 4: Từ đơn giản",
+                    text: "sad sad ask ask lad lad fall fall all all dad dad lass lass"
+                },
+                {
+                    title: "Bài 5: Hàng trên (QWER - UIOP)",
+                    text: "qwer uiop qwer uiop qqq www eee rrr uuu iii ooo ppp"
+                },
+                {
+                    title: "Bài 6: Hàng dưới (ZXCV - NM)",
+                    text: "zxcv nm zxcv nm zzz xxx ccc vvv nnn mmm"
+                }
+            ],
+            intermediate: [
+                {
+                    title: "Bài 1: Tất cả các chữ cái",
+                    text: "the quick brown fox jumps over the lazy dog pack my box with five dozen liquor jugs"
+                },
+                {
+                    title: "Bài 2: Từ thông dụng tiếng Việt",
+                    text: "tôi bạn anh chị em gia đình nhà trường học việc làm công ty"
+                },
+                {
+                    title: "Bài 3: Số và ký tự đặc biệt",
+                    text: "123 456 789 0 !@# $%^ &*() -_= +[] {}| ;': <>? ./"
+                },
+                {
+                    title: "Bài 4: Câu đơn giản",
+                    text: "Hôm nay là một ngày đẹp trời. Tôi đang học gõ bàn phím mười ngón."
+                },
+                {
+                    title: "Bài 5: Từ dài và phức tạp",
+                    text: "programming development technology computer keyboard practice exercise"
+                }
+            ],
+            advanced: [
+                {
+                    title: "Bài 1: Đoạn văn tiếng Việt",
+                    text: "Việt Nam là một đất nước xinh đẹp với nhiều danh lam thắng cảnh nổi tiếng. Từ vịnh Hạ Long hùng vĩ đến đồng bằng sông Cửu Long phì nhiêu, mỗi vùng miền đều có nét đẹp riêng."
+                },
+                {
+                    title: "Bài 2: Văn bản kỹ thuật",
+                    text: "HTML, CSS và JavaScript là ba ngôn ngữ cơ bản trong phát triển web frontend. HTML định nghĩa cấu trúc, CSS tạo kiểu dáng, và JavaScript thêm tính tương tác."
+                },
+                {
+                    title: "Bài 3: Số liệu và thống kê",
+                    text: "Năm 2023, dân số Việt Nam đạt khoảng 98.5 triệu người. GDP bình quân đầu người là 4,110 USD, tăng 8.02% so với năm trước."
+                },
+                {
+                    title: "Bài 4: Câu phức tạp",
+                    text: "Trong thời đại công nghệ 4.0, việc nắm vững kỹ năng gõ bàn phím nhanh và chính xác không chỉ giúp tăng hiệu quả công việc mà còn mở ra nhiều cơ hội nghề nghiệp mới."
+                },
+                {
+                    title: "Bài 5: Thử thách tốc độ",
+                    text: "Thành thạo gõ 10 ngón không chỉ là kỹ năng mà còn là nghệ thuật. Mỗi ngón tay đều có vai trò riêng, phối hợp nhịp nhàng để tạo nên những dòng chữ uyển chuyển trên màn hình."
+                }
+            ]
+        };
+
+        const keyboardLayout = [
+            [
+                {key: '`', class: ''}, {key: '1', class: ''}, {key: '2', class: ''}, {key: '3', class: ''}, 
+                {key: '4', class: ''}, {key: '5', class: ''}, {key: '6', class: ''}, {key: '7', class: ''}, 
+                {key: '8', class: ''}, {key: '9', class: ''}, {key: '0', class: ''}, {key: '-', class: ''}, 
+                {key: '=', class: ''}, {key: 'Backspace', class: 'key-widest'}
+            ],
+            [
+                {key: 'Tab', class: 'key-wider'}, {key: 'Q', class: ''}, {key: 'W', class: ''}, {key: 'E', class: ''}, 
+                {key: 'R', class: ''}, {key: 'T', class: ''}, {key: 'Y', class: ''}, {key: 'U', class: ''}, 
+                {key: 'I', class: ''}, {key: 'O', class: ''}, {key: 'P', class: ''}, {key: '[', class: ''}, 
+                {key: ']', class: ''}, {key: '\\', class: 'key-wide'}
+            ],
+            [
+                {key: 'Caps', class: 'key-widest'}, {key: 'A', class: ''}, {key: 'S', class: ''}, {key: 'D', class: ''}, 
+                {key: 'F', class: ''}, {key: 'G', class: ''}, {key: 'H', class: ''}, {key: 'J', class: ''}, 
+                {key: 'K', class: ''}, {key: 'L', class: ''}, {key: ';', class: ''}, {key: "'", class: ''}, 
+                {key: 'Enter', class: 'key-widest'}
+            ],
+            [
+                {key: 'Shift', class: 'key-widest'}, {key: 'Z', class: ''}, {key: 'X', class: ''}, {key: 'C', class: ''}, 
+                {key: 'V', class: ''}, {key: 'B', class: ''}, {key: 'N', class: ''}, {key: 'M', class: ''}, 
+                {key: ',', class: ''}, {key: '.', class: ''}, {key: '/', class: ''}, {key: 'Shift', class: 'key-widest'}
+            ],
+            [
+                {key: 'Ctrl', class: 'key-wide'}, {key: 'Win', class: 'key-wide'}, {key: 'Alt', class: 'key-wide'}, 
+                {key: 'Space', class: 'spacebar'}, {key: 'Alt', class: 'key-wide'}, {key: 'Win', class: 'key-wide'}, 
+                {key: 'Menu', class: 'key-wide'}, {key: 'Ctrl', class: 'key-wide'}
+            ]
+        ];
+
+        const fingerMapping = {
+            '`': 1, '1': 1, 'Q': 1, 'A': 1, 'Z': 1,
+            '2': 2, 'W': 2, 'S': 2, 'X': 2,
+            '3': 3, 'E': 3, 'D': 3, 'C': 3,
+            '4': 4, '5': 4, 'R': 4, 'T': 4, 'F': 4, 'G': 4, 'V': 4, 'B': 4,
+            '6': 7, '7': 7, 'Y': 7, 'U': 7, 'H': 7, 'J': 7, 'N': 7, 'M': 7,
+            '8': 8, 'I': 8, 'K': 8, ',': 8,
+            '9': 9, 'O': 9, 'L': 9, '.': 9,
+            '0': 10, '-': 10, '=': 10, 'P': 10, '[': 10, ']': 10, ';': 10, "'": 10, '/': 10,
+            ' ': 5
+        };
+
+        function createKeyboard() {
+            const keyboard = document.getElementById('keyboard');
+            keyboard.innerHTML = '';
+            
+            keyboardLayout.forEach(row => {
+                const rowElement = document.createElement('div');
+                rowElement.className = 'keyboard-row';
+                
+                row.forEach(keyData => {
+                    const keyElement = document.createElement('div');
+                    keyElement.className = `key ${keyData.class}`;
+                    keyElement.textContent = keyData.key;
+                    
+                    const finger = fingerMapping[keyData.key.toUpperCase()];
+                    if (finger) {
+                        keyElement.className += ` finger-${finger}`;
+                    }
+                    
+                    rowElement.appendChild(keyElement);
+                });
+                
+                keyboard.appendChild(rowElement);
+            });
+        }
+
+        function selectMode(mode) {
+            currentMode = mode;
+            currentLessonIndex = 0;
+            
+            document.querySelectorAll('.level-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelector(`.level-btn.${mode}`).classList.add('active');
+            
+            if (mode === 'game') {
+                document.getElementById('practiceArea').style.display = 'none';
+                document.getElementById('gameArea').style.display = 'block';
+                selectGame('falling');
+            } else {
+                document.getElementById('practiceArea').style.display = 'block';
+                document.getElementById('gameArea').style.display = 'none';
+                loadLesson();
+            }
+        }
+
+        function selectGame(game) {
+            currentGame = game;
+            
+            document.querySelectorAll('.game-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelector(`[onclick="selectGame('${game}')"]`).classList.add('active');
+            
+            document.querySelectorAll('.game-container').forEach(container => {
+                container.style.display = 'none';
+            });
+            
+            document.getElementById(game + 'Game').style.display = 'block';
+            resetGame();
+        }
+
+        function loadLesson() {
+            const lesson = lessons[currentMode][currentLessonIndex];
+            document.getElementById('lessonTitle').textContent = lesson.title;
+            currentText = lesson.text;
+            currentPosition = 0;
+            
+            displayText();
+            resetInput();
+            resetStats();
+        }
+
+        function displayText() {
+            const display = document.getElementById('textDisplay');
+            display.innerHTML = '';
+            
+            for (let i = 0; i < currentText.length; i++) {
+                const span = document.createElement('span');
+                span.className = 'char';
+                span.textContent = currentText[i];
+                
+                if (i === currentPosition) {
+                    span.className += ' current';
+                } else if (i < currentPosition) {
+                    span.className += ' correct';
+                }
+                
+                display.appendChild(span);
+            }
+        }
+
+        function highlightKey(char) {
+            document.querySelectorAll('.key').forEach(key => key.classList.remove('highlight'));
+            
+            const targetKey = char.toUpperCase();
+            document.querySelectorAll('.key').forEach(key => {
+                if (key.textContent === targetKey || (targetKey === ' ' && key.textContent === 'Space')) {
+                    key.classList.add('highlight');
+                }
+            });
+        }
+
+        function resetInput() {
+            const input = document.getElementById('textInput');
+            input.value = '';
+            input.focus();
+        }
+
+        function resetStats() {
+            startTime = null;
+            totalChars = 0;
+            correctChars = 0;
+            currentPosition = 0;
+            
+            if (timer) {
+                clearInterval(timer);
+                timer = null;
+            }
+            
+            updateStats();
+            displayText();
+            
+            if (currentText.length > 0) {
+                highlightKey(currentText[0]);
+            }
+        }
+
+        function updateStats() {
+            const wpmElement = document.getElementById('wpm');
+            const accuracyElement = document.getElementById('accuracy');
+            const progressElement = document.getElementById('progress');
+            const timeElement = document.getElementById('time');
+            
+            const currentTime = startTime ? (Date.now() - startTime) / 1000 : 0;
+            const wpm = currentTime > 0 ? Math.round((correctChars / 5) / (currentTime / 60)) : 0;
+            const accuracy = totalChars > 0 ? Math.round((correctChars / totalChars) * 100) : 100;
+            const progress = Math.round((currentPosition / currentText.length) * 100);
+            
+            wpmElement.textContent = wpm;
+            accuracyElement.textContent = accuracy + '%';
+            progressElement.textContent = progress + '%';
+            timeElement.textContent = Math.round(currentTime);
+        }
+
+        function startNewLesson() {
+            loadLesson();
+        }
+
+        function nextLesson() {
+            if (currentLessonIndex < lessons[currentMode].length - 1) {
+                currentLessonIndex++;
+                loadLesson();
+            } else {
+                alert('🎉 Chúc mừng! Bạn đã hoàn thành tất cả bài học ở cấp độ này!');
+            }
+        }
+
+        // Game Functions
+        function startGame(gameType) {
+            gameActive = true;
+            gamePaused = false;
+            
+            if (gameType === 'falling') {
+                startFallingWordsGame();
+            } else if (gameType === 'racing') {
+                startRacingGame();
+            } else if (gameType === 'zombie') {
+                startZombieGame();
+            }
+        }
+
+        function pauseGame() {
+            if (gameActive) {
+                gamePaused = !gamePaused;
+                if (gamePaused) {
+                    clearInterval(gameTimer);
+                } else {
+                    if (currentGame === 'falling') {
+                        gameTimer = setInterval(updateFallingGame, 100);
+                    } else if (currentGame === 'zombie') {
+                        gameTimer = setInterval(updateZombieGame, 100);
+                    }
+                }
+            }
+        }
+
+        function resetGame() {
+            gameActive = false;
+            gamePaused = false;
+            if (gameTimer) {
+                clearInterval(gameTimer);
+                gameTimer = null;
+            }
+            
+            if (currentGame === 'falling') {
+                resetFallingGame();
+            } else if (currentGame === 'racing') {
+                resetRacingGame();
+            } else if (currentGame === 'zombie') {
+                resetZombieGame();
+            }
+        }
+
+        // Falling Words Game
+        function startFallingWordsGame() {
+            resetFallingGame();
+            gameActive = true;
+            gameTimer = setInterval(updateFallingGame, 100);
+            document.getElementById('gameInput').focus();
+        }
+
+        function resetFallingGame() {
+            fallingWords = [];
+            gameScore = 0;
+            gameLives = 3;
+            gameLevel = 1;
+            document.getElementById('gameCanvas').innerHTML = '<div class="cannon">🔫</div>';
+            document.getElementById('gameInput').value = '';
+            updateFallingGameStats();
+        }
+
+        function updateFallingGame() {
+            if (!gameActive || gamePaused) return;
+            
+            // Spawn new words
+            if (Math.random() < 0.02 + gameLevel * 0.01) {
+                spawnFallingWord();
+            }
+            
+            // Update falling words
+            fallingWords.forEach((word, index) => {
+                word.element.style.top = (parseInt(word.element.style.top) + word.speed) + 'px';
+                
+                if (parseInt(word.element.style.top) > 350) {
+                    word.element.remove();
+                    fallingWords.splice(index, 1);
+                    gameLives--;
+                    if (gameLives <= 0) {
+                        endGame();
+                    }
+                }
+            });
+            
+            updateFallingGameStats();
+        }
+
+        function spawnFallingWord() {
+            const words = gameLevel <= 2 ? gameWords.easy : gameLevel <= 4 ? gameWords.medium : gameWords.hard;
+            const word = words[Math.floor(Math.random() * words.length)];
+            
+            const wordElement = document.createElement('div');
+            wordElement.className = 'falling-word';
+            wordElement.textContent = word;
+            wordElement.style.left = Math.random() * 80 + '%';
+            wordElement.style.top = '-50px';
+            wordElement.style.animationDuration = (3 - gameLevel * 0.2) + 's';
+            
+            document.getElementById('gameCanvas').appendChild(wordElement);
+            
+            fallingWords.push({
+                element: wordElement,
+                text: word,
+                speed: 2 + gameLevel
+            });
+        }
+
+        function updateFallingGameStats() {
+            document.getElementById('score').textContent = gameScore;
+            document.getElementById('lives').textContent = gameLives;
+            document.getElementById('level').textContent = gameLevel;
+        }
+
+        // Racing Game
+        function startRacingGame() {
+            resetRacingGame();
+            gameActive = true;
+            generateRaceText();
+            document.getElementById('raceInput').focus();
+            
+            // Start AI cars
+            gameTimer = setInterval(updateRacingGame, 100);
+        }
+
+        function resetRacingGame() {
+            raceProgress = 0;
+            aiProgress = [0, 0, 0];
+            document.getElementById('raceInput').value = '';
+            document.querySelector('.player-car').style.left = '10px';
+            document.querySelectorAll('.ai-car').forEach((car, index) => {
+                car.style.left = '10px';
+            });
+            updateRacingStats();
+        }
+
+        function generateRaceText() {
+            const sentences = [
+                'the quick brown fox jumps over the lazy dog',
+                'pack my box with five dozen liquor jugs',
+                'how vexingly quick daft zebras jump',
+                'bright vixens jump dozy fowl quack'
+            ];
+            const text = sentences[Math.floor(Math.random() * sentences.length)];
+            document.getElementById('raceText').textContent = text;
+            return text;
+        }
+
+        function updateRacingGame() {
+            if (!gameActive) return;
+            
+            // Update AI progress
+            aiProgress.forEach((progress, index) => {
+                aiProgress[index] += Math.random() * 0.5;
+                const car = document.querySelectorAll('.ai-car')[index];
+                const maxWidth = car.parentElement.offsetWidth - 60;
+                car.style.left = Math.min(aiProgress[index] * 3, maxWidth) + 'px';
+            });
+            
+            updateRacingStats();
+            
+            // Check if any AI finished
+            if (Math.max(...aiProgress) >= 100) {
+                endRace();
+            }
+        }
+
+        function updateRacingStats() {
+            document.getElementById('distance').textContent = Math.round(raceProgress);
+            document.getElementById('speed').textContent = Math.round(raceProgress * 2);
+            
+            let position = 1;
+            aiProgress.forEach(progress => {
+                if (progress > raceProgress) position++;
+            });
+            document.getElementById('position').textContent = position + '/4';
+        }
+
+        function endRace() {
+            gameActive = false;
+            clearInterval(gameTimer);
+            
+            let position = 1;
+            aiProgress.forEach(progress => {
+                if (progress > raceProgress) position++;
+            });
+            
+            if (position === 1) {
+                alert('🏆 Chúc mừng! Bạn đã thắng cuộc đua!');
+            } else {
+                alert(`🏁 Cuộc đua kết thúc! Bạn về vị trí thứ ${position}`);
+            }
+        }
+
+        // Zombie Game
+        function startZombieGame() {
+            resetZombieGame();
+            gameActive = true;
+            spawnZombieWord();
+            gameTimer = setInterval(updateZombieGame, 100);
+            document.getElementById('zombieInput').focus();
+        }
+
+        function resetZombieGame() {
+            zombieHealth = 100;
+            zombieKills = 0;
+            document.getElementById('zombieField').innerHTML = '<div class="player">🤠</div>';
+            document.getElementById('zombieInput').value = '';
+            updateZombieStats();
+        }
+
+        function spawnZombieWord() {
+            const words = gameWords.easy.concat(gameWords.medium);
+            currentZombieWord = words[Math.floor(Math.random() * words.length)];
+            document.getElementById('zombieWord').textContent = currentZombieWord;
+            
+            // Spawn zombie visual
+            const zombie = document.createElement('div');
+            zombie.className = 'zombie';
+            zombie.textContent = '🧟';
+            zombie.style.top = Math.random() * 200 + 'px';
+            zombie.style.right = '-50px';
+            document.getElementById('zombieField').appendChild(zombie);
+        }
+
+        function updateZombieGame() {
+            if (!gameActive || gamePaused) return;
+            
+            // Check if zombies reached player
+            const zombies = document.querySelectorAll('.zombie');
+            zombies.forEach(zombie => {
+                const right = parseInt(zombie.style.right) || -50;
+                if (right > window.innerWidth - 100) {
+                    zombieHealth -= 10;
+                    zombie.remove();
+                    if (zombieHealth <= 0) {
+                        endZombieGame();
+                    }
+                }
+            });
+            
+            updateZombieStats();
+        }
+
+        function updateZombieStats() {
+            document.getElementById('health').textContent = zombieHealth;
+            document.getElementById('kills').textContent = zombieKills;
+        }
+
+        function endZombieGame() {
+            gameActive = false;
+            clearInterval(gameTimer);
+            alert(`💀 Game Over! Bạn đã tiêu diệt ${zombieKills} zombie!`);
+        }
+
+        function endGame() {
+            gameActive = false;
+            clearInterval(gameTimer);
+            alert(`🎮 Game Over! Điểm số: ${gameScore}`);
+        }
+
+        // Game input handlers
+        document.addEventListener('DOMContentLoaded', function() {
+            // Falling words game input
+            document.getElementById('gameInput').addEventListener('input', function(e) {
+                if (!gameActive) return;
+                
+                const input = e.target.value.toLowerCase().trim();
+                
+                fallingWords.forEach((word, index) => {
+                    if (word.text.toLowerCase() === input) {
+                        // Hit!
+                        word.element.remove();
+                        fallingWords.splice(index, 1);
+                        gameScore += word.text.length * 10;
+                        e.target.value = '';
+                        
+                        // Create explosion effect
+                        const explosion = document.createElement('div');
+                        explosion.className = 'explosion';
+                        explosion.textContent = '💥';
+                        explosion.style.left = word.element.style.left;
+                        explosion.style.top = word.element.style.top;
+                        document.getElementById('gameCanvas').appendChild(explosion);
+                        
+                        setTimeout(() => explosion.remove(), 500);
+                        
+                        // Level up
+                        if (gameScore > gameLevel * 100) {
+                            gameLevel++;
+                        }
+                    }
+                });
+            });
+            
+            // Racing game input
+            document.getElementById('raceInput').addEventListener('input', function(e) {
+                if (!gameActive) return;
+                
+                const input = e.target.value;
+                const target = document.getElementById('raceText').textContent;
+                
+                let correct = 0;
+                for (let i = 0; i < Math.min(input.length, target.length); i++) {
+                    if (input[i] === target[i]) {
+                        correct++;
+                    } else {
+                        break;
+                    }
+                }
+                
+                raceProgress = (correct / target.length) * 100;
+                const maxWidth = document.querySelector('.player-car').parentElement.offsetWidth - 60;
+                document.querySelector('.player-car').style.left = (raceProgress / 100 * maxWidth) + 'px';
+                
+                if (input === target) {
+                    gameActive = false;
+                    clearInterval(gameTimer);
+                    alert('🏆 Chúc mừng! Bạn đã hoàn thành đầu tiên!');
+                    generateRaceText();
+                    e.target.value = '';
+                }
+            });
+            
+            // Zombie game input
+            document.getElementById('zombieInput').addEventListener('input', function(e) {
+                if (!gameActive) return;
+                
+                const input = e.target.value.toLowerCase().trim();
+                
+                if (input === currentZombieWord.toLowerCase()) {
+                    // Kill zombie
+                    const zombies = document.querySelectorAll('.zombie');
+                    if (zombies.length > 0) {
+                        zombies[zombies.length - 1].remove();
+                    }
+                    
+                    zombieKills++;
+                    e.target.value = '';
+                    spawnZombieWord();
+                }
+            });
+        });
+
+        document.getElementById('textInput').addEventListener('input', function(e) {
+            const input = e.target.value;
+            
+            if (!startTime) {
+                startTime = Date.now();
+                timer = setInterval(updateStats, 100);
+            }
+            
+            if (input.length > currentText.length) {
+                e.target.value = input.slice(0, currentText.length);
+                return;
+            }
+            
+            currentPosition = input.length;
+            totalChars = Math.max(totalChars, currentPosition);
+            correctChars = 0;
+            
+            // Update display
+            const display = document.getElementById('textDisplay');
+            const chars = display.querySelectorAll('.char');
+            
+            for (let i = 0; i < chars.length; i++) {
+                chars[i].className = 'char';
+                
+                if (i < input.length) {
+                    if (input[i] === currentText[i]) {
+                        chars[i].className += ' correct';
+                        correctChars++;
+                    } else {
+                        chars[i].className += ' incorrect';
+                    }
+                } else if (i === input.length) {
+                    chars[i].className += ' current';
+                }
+            }
+            
+            // Highlight next key
+            if (currentPosition < currentText.length) {
+                highlightKey(currentText[currentPosition]);
+            }
+            
+            updateStats();
+            
+            // Check completion
+            if (input === currentText) {
+                clearInterval(timer);
+                setTimeout(() => {
+                    alert('🎉 Hoàn thành! Bạn có muốn chuyển sang bài tiếp theo không?');
+                }, 500);
+            }
+        });
+
+        // Initialize
+        createKeyboard();
+        loadLesson();
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'98435011c760f8e8',t:'MTc1ODcyNzcxOC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
